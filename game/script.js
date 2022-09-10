@@ -19,21 +19,44 @@ diceDisplayEl.classList.add('hidden');
 const totalScores = [0, 0];
 let activePlayer = 0;
 let currentScore = 0;
+let playing = true;
 
-btnRollDice.addEventListener('click', function() {
-    const diceRoll = Math.trunc(Math.random() * 6 + 1);
+const switchActivePlayer = function () {
+    currentScore = 0;
+    document.getElementById(`current--${activePlayer}`).textContent = currentScore;
+    activePlayer = activePlayer === 0 ? 1 : 0;
+    playerZeroEl.classList.toggle('player--active');
+    playerOneEl.classList.toggle('player--active');
+}
 
-    diceDisplayEl.classList.remove('hidden');
-    diceDisplayEl.src = `dice-${diceRoll}.png`;
+btnRollDice.addEventListener('click', function () {
+    if (playing) {
+        const diceRoll = Math.trunc(Math.random() * 6 + 1);
 
-    if(diceRoll !== 1) {
-        currentScore += diceRoll;
-        document.getElementById(`current--${activePlayer}`).textContent = currentScore;
-    } else {
-        currentScore = 0;
-        document.getElementById(`current--${activePlayer}`).textContent = currentScore;
-        activePlayer = activePlayer === 0 ? 1 : 0;
-        playerZeroEl.classList.toggle('player--active');
-        playerOneEl.classList.toggle('player--active');
+        diceDisplayEl.classList.remove('hidden');
+        diceDisplayEl.src = `dice-${diceRoll}.png`;
+
+        if (diceRoll !== 1) {
+            currentScore += diceRoll;
+            document.getElementById(`current--${activePlayer}`).textContent = currentScore;
+        } else {
+            switchActivePlayer();
+        }
+    }
+})
+
+btnHoldScore.addEventListener('click', function () {
+    if (playing) {
+        totalScores[activePlayer] += currentScore;
+        document.querySelector(`#score--${activePlayer}`).textContent = totalScores[activePlayer];
+        if (totalScores[activePlayer] >= 10) {
+            playing = false;
+            document.querySelector(`.player--${activePlayer}`).classList.add('player--winner');
+            document.querySelector(`.player--${activePlayer}`).classList.remove('player--active');
+            diceDisplayEl.classList.add('hidden');
+        }
+        if (playing) {
+            switchActivePlayer();
+        }
     }
 })
